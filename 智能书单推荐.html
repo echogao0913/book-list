@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 每周智能书单推荐</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .week-info {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .book-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s;
+            background: linear-gradient(to bottom, #fff 0%, #f8f9fa 100%);
+        }
+
+        .book-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.25);
+            transform: translateY(-5px);
+        }
+
+        .book-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .book-category {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .book-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #333;
+            margin: 15px 0 10px;
+            line-height: 1.4;
+        }
+
+        .book-author {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .book-meta {
+            font-size: 0.9rem;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        .book-summary {
+            color: #555;
+            line-height: 1.8;
+            margin: 15px 0;
+            text-align: justify;
+        }
+
+        .book-theme {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 0.95rem;
+            color: #856404;
+        }
+
+        .book-theme strong {
+            color: #533f03;
+        }
+
+        .book-author-bg {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 0.95rem;
+            color: #0c5460;
+        }
+
+        .book-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .douban-rating {
+            color: #ffc107;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-added {
+            background: #6c757d;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .reading-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #e0e0e0;
+        }
+
+        .progress-section {
+            margin: 15px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            transition: width 0.3s;
+        }
+
+        .progress-input {
+            width: 100%;
+        }
+
+        .rating-section {
+            margin: 15px 0;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            font-size: 1.8rem;
+            margin-top: 5px;
+        }
+
+        .star {
+            cursor: pointer;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+
+        .star.filled {
+            color: #ffc107;
+        }
+
+        .review-section {
+            margin: 15px 0;
+        }
+
+        .review-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            margin-top: 8px;
+        }
+
+        .review-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 2px solid transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .books-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 每周智能书单推荐</h1>
+            <div class="week-info">第 <span id="currentWeek"></span> 周 - <span id="currentDate"></span></div>
+            <button class="refresh-btn" onclick="refreshRecommendations()">🔄 换一批推荐</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('recommend')">本周推荐</button>
+            <button class="tab" onclick="switchTab('mylist')">我的书单</button>
+            <button class="tab" onclick="switchTab('stats')">阅读统计</button>
+        </div>
+
+        <div class="content">
+            <!-- 本周推荐 -->
+            <div id="tab-recommend" class="tab-content active">
+                <h2 style="margin-bottom: 15px; color: #333;">为你精选的本周书单</h2>
+                <p style="color: #666; margin-bottom: 20px;">基于你的阅读偏好，为你推荐以下优质书籍</p>
+
+                <div class="filter-section">
+                    <button class="filter-btn active" onclick="filterCategory('all')">全部</button>
+                    <button class="filter-btn" onclick="filterCategory('文学小说')">文学小说</button>
+                    <button class="filter-btn" onclick="filterCategory('历史传记')">历史传记</button>
+                    <button class="filter-btn" onclick="filterCategory('哲学思想')">哲学思想</button>
+                    <button class="filter-btn" onclick="filterCategory('心理成长')">心理成长</button>
+                    <button class="filter-btn" onclick="filterCategory('管理学')">管理学</button>
+                </div>
+
+                <div id="recommendBooks" class="books-grid"></div>
+            </div>
+
+            <!-- 我的书单 -->
+            <div id="tab-mylist" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: #333;">我的阅读清单</h2>
+                <div id="myBooks" class="books-grid"></div>
+            </div>
+
+            <!-- 阅读统计 -->
+            <div id="tab-stats" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: #333;">阅读统计</h2>
+                <div class="stats-grid" id="statsGrid"></div>
+                <button class="btn" style="background: #667eea; color: white; margin-top: 20px;" onclick="exportData()">📥 导出阅读数据</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 精选中文书籍库
+        const BOOK_DATABASE = [
+            // 文学小说
+            {
+                title: "活着",
+                author: "余华",
+                category: "文学小说",
+                publisher: "作家出版社",
+                year: "2012",
+                rating: 9.4,
+                summary: "《活着》讲述了一个人一生的故事，这是一个历尽世间沧桑和磨难老人的人生感言。小说的叙述者"我"在年轻时获得了一个游手好闲的职业——去乡间收集民间歌谣。在夏天刚刚来到的季节，遇到那位名叫福贵的老人，听他讲述了自己坎坷的人生经历。",
+                theme: "生命的韧性与人性的光辉。通过福贵一生的悲惨遭遇，展现了普通中国人在时代变迁中的生存智慧和对生命的执着。",
+                authorBg: "余华，1960年生于浙江杭州，当代著名作家。作品被翻译成20多种语言，获得多项国际文学奖项。"
+            },
+            {
+                title: "百年孤独",
+                author: "[哥伦比亚] 加西亚·马尔克斯",
+                category: "文学小说",
+                publisher: "南海出版公司",
+                year: "2011",
+                rating: 9.3,
+                summary: "《百年孤独》是魔幻现实主义文学的代表作，描写了布恩迪亚家族七代人的传奇故事，以及加勒比海沿岸小镇马孔多的百年兴衰，反映了拉丁美洲一个世纪以来风云变幻的历史。",
+                theme: "孤独是人类永恒的命题。通过布恩迪亚家族的兴衰，探讨孤独、时间循环、命运等深刻主题，展现拉美历史与文化。",
+                authorBg: "加西亚·马尔克斯，诺贝尔文学奖得主，魔幻现实主义文学代表人物，被誉为20世纪最伟大的作家之一。"
+            },
+            {
+                title: "平凡的世界",
+                author: "路遥",
+                category: "文学小说",
+                publisher: "北京十月文艺出版社",
+                year: "2013",
+                rating: 9.2,
+                summary: "这是一部全景式地表现中国当代城乡社会生活的长篇小说。全书共三部，作者在近十年间广阔背景上，通过复杂的矛盾纠葛，刻画了社会各阶层众多普通人的形象。",
+                theme: "奋斗与尊严。在平凡的世界里，平凡的人以不平凡的方式追求自己的人生价值，展现了普通劳动者的奋斗精神。",
+                authorBg: "路遥（1949-1992），陕西作家，以《平凡的世界》获得第三届茅盾文学奖。作品深刻反映了中国农村的变革。"
+            },
+            {
+                title: "三体",
+                author: "刘慈欣",
+                category: "文学小说",
+                publisher: "重庆出版社",
+                year: "2008",
+                rating: 9.3,
+                summary: "地球文明向宇宙发出的第一声啼鸣被三体文明接收。在运用超技术锁死地球人的基础科学之后，三体人庞大的宇宙舰队开始向地球进发。面对前所未有的危机，人类展开了绝地反击。",
+                theme: "文明的进化与生存法则。探讨宇宙社会学、黑暗森林法则等深刻命题，展现人类文明在宇宙尺度下的思考。",
+                authorBg: "刘慈欣，中国科幻文学代表作家，亚洲首位雨果奖得主，被誉为'中国科幻第一人'。"
+            },
+            {
+                title: "红楼梦",
+                author: "曹雪芹",
+                category: "文学小说",
+                publisher: "人民文学出版社",
+                year: "2008",
+                rating: 9.7,
+                summary: "《红楼梦》是一部具有世界影响力的人情小说，举世公认的中国古典小说巅峰之作。小说以贾、史、王、薛四大家族的兴衰为背景，以贾宝玉、林黛玉、薛宝钗的爱情婚姻悲剧为主线。",
+                theme: "人性的复杂与社会的变迁。通过大观园的兴衰，展现封建社会的没落和人性的多面性，是中国文学的巅峰之作。",
+                authorBg: "曹雪芹（约1715-1763），清代小说家，《红楼梦》作者。出身显赫但家道中落，晚年贫困潦倒，呕心沥血创作此书。"
+            },
+
+            // 历史传记
+            {
+                title: "人类简史",
+                author: "[以色列] 尤瓦尔·赫拉利",
+                category: "历史传记",
+                publisher: "中信出版社",
+                year: "2014",
+                rating: 9.1,
+                summary: "《人类简史》从十万年前有生命迹象开始到21世纪资本、科技交织的人类发展史。十万年前，地球上至少有六个人种，为何今天只剩下我们这一支？认知革命、农业革命、科学革命如何改变人类的命运？",
+                theme: "人类发展的三次革命。从认知革命到科技革命，探讨人类如何从非洲走向世界，从狩猎采集到建立帝国和信仰体系。",
+                authorBg: "尤瓦尔·赫拉利，牛津大学历史学博士，耶路撒冷希伯来大学历史系教授，全球瞩目的新锐历史学家。"
+            },
+            {
+                title: "万历十五年",
+                author: "黄仁宇",
+                category: "历史传记",
+                publisher: "生活·读书·新知三联书店",
+                year: "2007",
+                rating: 9.0,
+                summary: "万历十五年，亦即公元1587年，在西欧历史上为西班牙舰队全部出动征英的前一年。在中国，这平平淡淡的一年中，发生了若干为历史学家所易于忽视的事件。",
+                theme: "以小见大的历史观。通过1587年看似平常的事件，揭示明朝政治体制的深层矛盾和中国传统社会的困境。",
+                authorBg: "黄仁宇（1918-2000），历史学家，提出'大历史观'，主张从技术、制度、文化的角度研究历史。"
+            },
+            {
+                title: "苏东坡传",
+                author: "林语堂",
+                category: "历史传记",
+                publisher: "湖南文艺出版社",
+                year: "2014",
+                rating: 8.9,
+                summary: "《苏东坡传》是林语堂最得意的作品，中国文人从政的标本，苏东坡的一生跌宕起伏、波澜壮阔。他既是文学家、艺术家，又是美食家、工程师。林语堂用幽默的笔调，为我们还原了一个真实的苏东坡。",
+                theme: "中国文人的理想人格。展现苏东坡乐观豁达、才华横溢的一生，诠释了中国传统文人的精神境界。",
+                authorBg: "林语堂（1895-1976），著名作家、语言学家，向西方介绍中国文化的重要人物，曾获诺贝尔文学奖提名。"
+            },
+            {
+                title: "邓小平时代",
+                author: "[美] 傅高义",
+                category: "历史传记",
+                publisher: "生活·读书·新知三联书店",
+                year: "2013",
+                rating: 9.0,
+                summary: "邓小平深刻影响了中国历史和世界历史的走向，也改变了每一个当代中国人的命运。本书对邓小平个人性格及执政风格进行了深层分析，并对中国改革开放史进行了完整而独到的阐释。",
+                theme: "改革开放的历史进程。全面记录邓小平如何带领中国进行改革开放，以及这一决策对中国和世界的深远影响。",
+                authorBg: "傅高义，哈佛大学教授，著名中国问题专家，研究东亚问题超过半个世纪，被誉为'中国先生'。"
+            },
+            {
+                title: "史记",
+                author: "司马迁",
+                category: "历史传记",
+                publisher: "中华书局",
+                year: "2014",
+                rating: 9.6,
+                summary: "《史记》是西汉著名史学家司马迁撰写的一部纪传体史书，是中国历史上第一部纪传体通史，被列为'二十四史'之首。记载了上至上古传说中的黄帝时代，下至汉武帝太初四年间共3000多年的历史。",
+                theme: "中国史学的开山之作。以人物传记为中心，展现了中华文明的起源与发展，树立了史学著作的典范。",
+                authorBg: "司马迁（约前145-前90），西汉史学家、散文家。因李陵事件受宫刑，忍辱负重完成《史记》，成就千古名著。"
+            },
+
+            // 哲学思想
+            {
+                title: "苏菲的世界",
+                author: "[挪威] 乔斯坦·贾德",
+                category: "哲学思想",
+                publisher: "作家出版社",
+                year: "2007",
+                rating: 8.9,
+                summary: "《苏菲的世界》以小说的形式，通过一名哲学导师向一个叫苏菲的女孩传授哲学知识的经过，揭示了西方哲学史发展的历程。是最好的哲学入门书。",
+                theme: "哲学启蒙之旅。从古希腊到康德，从笛卡尔到马克思，用通俗易懂的方式介绍西方哲学发展史。",
+                authorBg: "乔斯坦·贾德，挪威作家，擅长以深入浅出的方式探讨哲学问题，《苏菲的世界》已被翻译成64种语言。"
+            },
+            {
+                title: "人生的智慧",
+                author: "[德] 叔本华",
+                category: "哲学思想",
+                publisher: "上海人民出版社",
+                year: "2014",
+                rating: 8.8,
+                summary: "叔本华的这本《人生的智慧》探讨的是如何尽量幸福、愉快地度过一生。他从世俗角度探讨了人生智慧，涉及财产、地位、荣誉、名声、人际关系等内容。",
+                theme: "追求幸福的智慧。从悲观主义出发，探讨如何在充满痛苦的世界中寻找幸福和满足。",
+                authorBg: "叔本华（1788-1860），德国哲学家，唯意志论主要代表，对尼采、弗洛伊德等思想家产生深远影响。"
+            },
+            {
+                title: "沉思录",
+                author: "[古罗马] 马可·奥勒留",
+                category: "哲学思想",
+                publisher: "中央编译出版社",
+                year: "2008",
+                rating: 8.7,
+                summary: "《沉思录》是古罗马哲学家皇帝马可·奥勒留所著，是一本写给自己的书，内容大部分是他在鞍马劳顿中写成的。作品来自作者对身羁宫廷的自己和自己所处混乱世界的感受。",
+                theme: "斯多葛主义的践行。教导人如何面对困境、控制情绪、保持理性，追求内心的宁静和自由。",
+                authorBg: "马可·奥勒留（121-180），古罗马皇帝，斯多葛派哲学家，被誉为'哲学家皇帝'。"
+            },
+            {
+                title: "道德经",
+                author: "老子",
+                category: "哲学思想",
+                publisher: "中华书局",
+                year: "2015",
+                rating: 9.5,
+                summary: "《道德经》，又称《老子》，是中国古代先秦诸子分家前的一部著作，为其时诸子所共仰。全书共81章，前37章为上篇道经，第38章以下属下篇德经。",
+                theme: "道家思想的核心经典。阐述'道'的概念，主张无为而治、顺应自然，对中国哲学和文化产生深远影响。",
+                authorBg: "老子，春秋时期思想家，道家学派创始人，中国哲学史上最重要的思想家之一。"
+            },
+            {
+                title: "理想国",
+                author: "[古希腊] 柏拉图",
+                category: "哲学思想",
+                publisher: "商务印书馆",
+                year: "2013",
+                rating: 8.9,
+                summary: "《理想国》是古希腊哲学家柏拉图创作的哲学对话体著作。全书主要讨论了正义与非正义问题，并以此为基础，详细讨论了理想国家和理想人的本质、标准及其实现途径等问题。",
+                theme: "政治哲学的奠基之作。探讨正义的本质、理想国家的构建、哲学王的概念，奠定了西方政治哲学的基础。",
+                authorBg: "柏拉图（前427-前347），古希腊哲学家，苏格拉底学生，亚里士多德老师，西方哲学的奠基者之一。"
+            },
+
+            // 心理成长
+            {
+                title: "被讨厌的勇气",
+                author: "[日] 岸见一郎 / 古贺史健",
+                category: "心理成长",
+                publisher: "机械工业出版社",
+                year: "2015",
+                rating: 8.6,
+                summary: "「被讨厌的勇气」并不是要去吸引被讨厌的负向能量，而是，如果这是我生命想绽放出最美的光彩，那么，即使有被讨厌的可能，我都要用自己的双手双脚往那里走去。」",
+                theme: "阿德勒心理学的实践。教导人们如何摆脱他人期待的束缚，勇敢做自己，获得真正的自由和幸福。",
+                authorBg: "岸见一郎，日本哲学家，专攻阿德勒心理学。古贺史健，自由作家，擅长对话体写作。"
+            },
+            {
+                title: "原生家庭",
+                author: "[美] 苏珊·福沃德",
+                category: "心理成长",
+                publisher: "北京时代华文书局",
+                year: "2018",
+                rating: 8.4,
+                summary: "本书通过案例分析指出原生家庭的伤害，并给出具体的方法帮助人们疗愈童年创伤，摆脱原生家庭的负面影响，找回真实的自我。",
+                theme: "疗愈原生家庭创伤。分析原生家庭对个人的深远影响，提供实用的疗愈方法，帮助人们获得心理自由。",
+                authorBg: "苏珊·福沃德，国际知名心理治疗师、演说家，在家庭关系治疗领域有40多年临床经验。"
+            },
+            {
+                title: "自卑与超越",
+                author: "[奥] 阿尔弗雷德·阿德勒",
+                category: "心理成长",
+                publisher: "作家出版社",
+                year: "2017",
+                rating: 8.5,
+                summary: "《自卑与超越》是阿德勒的后期代表作，探讨了自卑感的形成及其对个人的影响，以及如何通过建立正确的生活目标和改善人际关系来超越自卑。",
+                theme: "个体心理学的经典。揭示自卑感的普遍性，指导人们如何将自卑转化为进步的动力，追求优越感。",
+                authorBg: "阿德勒（1870-1937），奥地利精神病学家，个体心理学创始人，与弗洛伊德、荣格并称心理学三巨头。"
+            },
+            {
+                title: "心流",
+                author: "[美] 米哈里·契克森米哈赖",
+                category: "心理成长",
+                publisher: "中信出版社",
+                year: "2017",
+                rating: 8.3,
+                summary: "心流是指我们在做某些事情时，那种全神贯注、投入忘我的状态。在这种状态下，你甚至感觉不到时间的存在，在这件事情完成之后我们会有一种充满能量并且非常满足的感受。",
+                theme: "最优体验的心理学。探讨如何通过进入心流状态获得幸福感和成就感，提升生活质量。",
+                authorBg: "米哈里，积极心理学奠基人之一，芝加哥大学心理学教授，'心流'理论提出者。"
+            },
+            {
+                title: "情商",
+                author: "[美] 丹尼尔·戈尔曼",
+                category: "心理成长",
+                publisher: "中信出版社",
+                year: "2010",
+                rating: 8.2,
+                summary: "《情商》是一本将心理学研究转化为普通读者可以理解和应用的著作。作者指出，情商包括了解自身情感、管理情绪、自我激励、识别他人情绪以及处理人际关系五个方面。",
+                theme: "情绪智力的重要性。论证情商比智商更重要，教导人们如何提高情商，改善人际关系和生活质量。",
+                authorBg: "丹尼尔·戈尔曼，哈佛大学心理学博士，著名心理学家，将'情商'概念推广到全世界。"
+            },
+
+            // 管理学
+            {
+                title: "从优秀到卓越",
+                author: "[美] 吉姆·柯林斯",
+                category: "管理学",
+                publisher: "中信出版社",
+                year: "2009",
+                rating: 8.6,
+                summary: "柯林斯历经5年的研究，发现了从优秀公司到卓越公司的转变过程中的普遍模式。他提出了第五级领导、先人后事、刺猬理念等重要概念。",
+                theme: "企业卓越的秘诀。通过对比研究，揭示优秀公司成为卓越公司的关键因素和转变规律。",
+                authorBg: "吉姆·柯林斯，斯坦福大学商学院教授，著名管理学思想家，长期研究企业可持续发展。"
+            },
+            {
+                title: "原则",
+                author: "[美] 瑞·达利欧",
+                category: "管理学",
+                publisher: "中信出版社",
+                year: "2018",
+                rating: 8.4,
+                summary: "瑞·达利欧认为，我们可以像看待机器一样看待生活、管理等问题，找到其中的规律，总结原则，这样才能更好地实现自己的人生目标。",
+                theme: "系统化思维与决策原则。分享作者40年的生活和工作原则，教导人们如何建立自己的原则体系。",
+                authorBg: "瑞·达利欧，桥水基金创始人，被称为'投资界的乔布斯'，白手起家建立了世界最大对冲基金。"
+            },
+            {
+                title: "高效能人士的七个习惯",
+                author: "[美] 史蒂芬·柯维",
+                category: "管理学",
+                publisher: "中国青年出版社",
+                year: "2010",
+                rating: 8.3,
+                summary: "这本书几乎覆盖所有美国成年人都知道的习惯法则。这七个习惯是：积极主动、以终为始、要事第一、双赢思维、知彼解己、统合综效、不断更新。",
+                theme: "个人效能提升的经典。提出七个习惯帮助人们从依赖到独立再到互赖，实现个人和组织的成功。",
+                authorBg: "史蒂芬·柯维（1932-2012），领导力专家，被《时代》周刊誉为'人类潜能的导师'。"
+            },
+            {
+                title: "领导力21法则",
+                author: "[美] 约翰·麦克斯韦尔",
+                category: "管理学",
+                publisher: "中国青年出版社",
+                year: "2012",
+                rating: 8.2,
+                summary: "麦克斯韦尔博士通过对历史人物和当代领导者的研究，总结出21条普遍适用的领导力法则。这些法则适用于各个层次的领导者。",
+                theme: "领导力的核心法则。系统阐述领导力的本质和提升方法，适用于各行各业的管理者。",
+                authorBg: "约翰·麦克斯韦尔，国际知名领导力专家，著有60多部领导力著作，影响力遍布全球。"
+            },
+            {
+                title: "创新者的窘境",
+                author: "[美] 克莱顿·克里斯坦森",
+                category: "管理学",
+                publisher: "中信出版社",
+                year: "2014",
+                rating: 8.5,
+                summary: "本书提出了颠覆性创新理论，分析了为什么大公司会在颠覆性技术出现时失败。作者指出，正是那些被广泛接受的优秀管理原则，最终导致了它们的失败。",
+                theme: "破坏性创新的力量。揭示大企业失败的原因，提出应对颠覆性创新的策略，影响了整个商业世界。",
+                authorBg: "克莱顿·克里斯坦森（1952-2020），哈佛商学院教授，颠覆性创新理论提出者，最具影响力的商业思想家之一。"
+            },
+            {
+                title: "精益创业",
+                author: "[美] 埃里克·莱斯",
+                category: "管理学",
+                publisher: "中信出版社",
+                year: "2012",
+                rating: 8.1,
+                summary: "《精益创业》介绍了一种新的创业方法论：通过快速迭代、验证学习、客户反馈等方式，以最小的成本和最快的速度找到产品市场匹配点。",
+                theme: "新创企业的生存法则。提出最小可行产品、快速迭代等概念，改变了创业和产品开发的方式。",
+                authorBg: "埃里克·莱斯，硅谷创业家，精益创业运动发起人，曾参与多个创业项目，总结实战经验。"
+            }
+        ];
+
+        // 用户数据
+        let myBookList = JSON.parse(localStorage.getItem('myBookList') || '[]');
+        let weeklyRecommendations = [];
+        let currentFilter = 'all';
+
+        // 初始化
+        function init() {
+            updateWeekInfo();
+            generateWeeklyRecommendations();
+            renderRecommendations();
+        }
+
+        // 获取周数
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        // 更新周信息
+        function updateWeekInfo() {
+            const now = new Date();
+            const weekNumber = getWeekNumber(now);
+            document.getElementById('currentWeek').textContent = weekNumber;
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('zh-CN');
+        }
+
+        // 生成每周推荐
+        function generateWeeklyRecommendations() {
+            const lastUpdate = localStorage.getItem('lastRecommendUpdate');
+            const currentWeek = getWeekNumber(new Date());
+            const savedWeek = localStorage.getItem('recommendWeek');
+
+            console.log('当前周数:', currentWeek, '保存的周数:', savedWeek);
+            console.log('书库总数:', BOOK_DATABASE.length);
+
+            // 如果是新的一周，或者首次访问，生成新推荐
+            if (!savedWeek || parseInt(savedWeek) !== currentWeek) {
+                console.log('生成新推荐...');
+                // 按类别分配书籍：文学2本，其他各1本
+                const categories = {
+                    '文学小说': 2,
+                    '历史传记': 1,
+                    '哲学思想': 1,
+                    '心理成长': 1,
+                    '管理学': 1
+                };
+
+                weeklyRecommendations = [];
+
+                Object.keys(categories).forEach(category => {
+                    const booksInCategory = BOOK_DATABASE.filter(b => b.category === category);
+                    const count = categories[category];
+
+                    console.log(`类别 ${category}: 找到 ${booksInCategory.length} 本书，需要 ${count} 本`);
+
+                    // 随机选择
+                    const shuffled = booksInCategory.sort(() => 0.5 - Math.random());
+                    weeklyRecommendations.push(...shuffled.slice(0, count));
+                });
+
+                console.log('生成的推荐数量:', weeklyRecommendations.length);
+                console.log('推荐书籍:', weeklyRecommendations.map(b => b.title));
+
+                // 保存推荐
+                localStorage.setItem('weeklyRecommendations', JSON.stringify(weeklyRecommendations));
+                localStorage.setItem('recommendWeek', currentWeek.toString());
+            } else {
+                // 加载已保存的推荐
+                console.log('加载已保存的推荐...');
+                weeklyRecommendations = JSON.parse(localStorage.getItem('weeklyRecommendations') || '[]');
+                console.log('加载的推荐数量:', weeklyRecommendations.length);
+            }
+        }
+
+        // 刷新推荐
+        function refreshRecommendations() {
+            if (confirm('确定要换一批推荐吗？')) {
+                localStorage.removeItem('recommendWeek');
+                generateWeeklyRecommendations();
+                renderRecommendations();
+            }
+        }
+
+        // 渲染推荐书籍
+        function renderRecommendations() {
+            const container = document.getElementById('recommendBooks');
+            let books = weeklyRecommendations;
+
+            console.log('开始渲染推荐，总数:', books.length);
+
+            if (currentFilter !== 'all') {
+                books = books.filter(b => b.category === currentFilter);
+                console.log('筛选后数量:', books.length, '筛选条件:', currentFilter);
+            }
+
+            if (books.length === 0) {
+                console.log('没有书籍可显示');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📚</div>
+                        <p>该类别暂无推荐</p>
+                    </div>
+                `;
+                return;
+            }
+
+            console.log('准备渲染', books.length, '本书');
+
+            container.innerHTML = books.map((book, index) => {
+                const isAdded = myBookList.some(b => b.title === book.title);
+                const myBook = myBookList.find(b => b.title === book.title);
+
+                return `
+                    <div class="book-card">
+                        <div class="book-header">
+                            <span class="book-category">${book.category}</span>
+                        </div>
+
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-author">作者：${book.author}</div>
+                        <div class="book-meta">${book.publisher} · ${book.year}</div>
+
+                        <div class="book-rating">
+                            <span style="color: #666;">豆瓣评分：</span>
+                            <span class="douban-rating">⭐ ${book.rating}</span>
+                        </div>
+
+                        <div class="book-theme">
+                            <strong>主旨：</strong>${book.theme}
+                        </div>
+
+                        <div class="book-summary">${book.summary}</div>
+
+                        <div class="book-author-bg">
+                            <strong>作者背景：</strong>${book.authorBg}
+                        </div>
+
+                        ${isAdded ? `
+                            <div class="reading-section">
+                                <div class="progress-section">
+                                    <div class="progress-label">
+                                        <span>阅读进度</span>
+                                        <span>${myBook.progress || 0}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${myBook.progress || 0}%"></div>
+                                    </div>
+                                    <input type="range" class="progress-input" min="0" max="100"
+                                           value="${myBook.progress || 0}"
+                                           onchange="updateProgress('${book.title}', this.value)">
+                                </div>
+
+                                <div class="rating-section">
+                                    <div style="font-weight: 600; color: #333; margin-bottom: 5px;">我的评分</div>
+                                    <div class="rating-stars">
+                                        ${[1,2,3,4,5].map(i => `
+                                            <span class="star ${i <= (myBook.rating || 0) ? 'filled' : ''}"
+                                                  onclick="updateRating('${book.title}', ${i})">★</span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+
+                                <div class="review-section">
+                                    <div style="font-weight: 600; color: #333; margin-bottom: 5px;">我的读后感</div>
+                                    <textarea class="review-textarea" placeholder="写下你的读后感..."
+                                              onblur="updateReview('${book.title}', this.value)">${myBook.review || ''}</textarea>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <div class="action-buttons">
+                            ${isAdded ?
+                                `<button class="btn btn-added">✓ 已添加到书单</button>` :
+                                `<button class="btn btn-add" onclick="addToMyList('${book.title.replace(/'/g, "\\'")}')">➕ 添加到我的书单</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 添加到我的书单
+        function addToMyList(bookTitle) {
+            const book = weeklyRecommendations.find(b => b.title === bookTitle);
+
+            if (!book) {
+                alert('未找到该书籍');
+                return;
+            }
+
+            if (myBookList.some(b => b.title === book.title)) {
+                alert('该书已在您的书单中');
+                return;
+            }
+
+            myBookList.push({
+                ...book,
+                addedDate: new Date().toLocaleDateString('zh-CN'),
+                progress: 0,
+                rating: 0,
+                review: ''
+            });
+
+            saveMyList();
+            renderRecommendations();
+            alert('✅ 已添加到我的书单！');
+        }
+
+        // 更新进度
+        function updateProgress(title, progress) {
+            const book = myBookList.find(b => b.title === title);
+            if (book) {
+                book.progress = parseInt(progress);
+                saveMyList();
+                renderRecommendations();
+                renderMyList();
+            }
+        }
+
+        // 更新评分
+        function updateRating(title, rating) {
+            const book = myBookList.find(b => b.title === title);
+            if (book) {
+                book.rating = rating;
+                saveMyList();
+                renderRecommendations();
+                renderMyList();
+            }
+        }
+
+        // 更新评论
+        function updateReview(title, review) {
+            const book = myBookList.find(b => b.title === title);
+            if (book) {
+                book.review = review;
+                saveMyList();
+            }
+        }
+
+        // 保存书单
+        function saveMyList() {
+            localStorage.setItem('myBookList', JSON.stringify(myBookList));
+        }
+
+        // 类别筛选
+        function filterCategory(category) {
+            currentFilter = category;
+
+            // 更新按钮状态
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(category) || (category === 'all' && btn.textContent === '全部')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            renderRecommendations();
+        }
+
+        // 渲染我的书单
+        function renderMyList() {
+            const container = document.getElementById('myBooks');
+
+            if (myBookList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📖</div>
+                        <p>还没有添加书籍，去推荐页面看看吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = myBookList.map((book, index) => `
+                <div class="book-card">
+                    <div class="book-header">
+                        <span class="book-category">${book.category}</span>
+                    </div>
+
+                    <div class="book-title">${book.title}</div>
+                    <div class="book-author">作者：${book.author}</div>
+                    <div class="book-meta">添加日期：${book.addedDate}</div>
+
+                    <div class="book-theme">
+                        <strong>主旨：</strong>${book.theme}
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>阅读进度</span>
+                            <span>${book.progress}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${book.progress}%"></div>
+                        </div>
+                        <input type="range" class="progress-input" min="0" max="100"
+                               value="${book.progress}"
+                               onchange="updateProgressInList(${index}, this.value)">
+                    </div>
+
+                    <div class="rating-section">
+                        <div style="font-weight: 600; color: #333; margin-bottom: 5px;">我的评分</div>
+                        <div class="rating-stars">
+                            ${[1,2,3,4,5].map(i => `
+                                <span class="star ${i <= book.rating ? 'filled' : ''}"
+                                      onclick="updateRatingInList(${index}, ${i})">★</span>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="review-section">
+                        <div style="font-weight: 600; color: #333; margin-bottom: 5px;">我的读后感</div>
+                        <textarea class="review-textarea" placeholder="写下你的读后感..."
+                                  onblur="updateReviewInList(${index}, this.value)">${book.review || ''}</textarea>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn" style="background: #dc3545; color: white;"
+                                onclick="removeFromList(${index})">🗑️ 移除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateProgressInList(index, progress) {
+            myBookList[index].progress = parseInt(progress);
+            saveMyList();
+            renderMyList();
+        }
+
+        function updateRatingInList(index, rating) {
+            myBookList[index].rating = rating;
+            saveMyList();
+            renderMyList();
+        }
+
+        function updateReviewInList(index, review) {
+            myBookList[index].review = review;
+            saveMyList();
+        }
+
+        function removeFromList(index) {
+            if (confirm('确定要移除这本书吗？')) {
+                myBookList.splice(index, 1);
+                saveMyList();
+                renderMyList();
+                renderRecommendations();
+            }
+        }
+
+        // 渲染统计
+        function renderStats() {
+            const container = document.getElementById('statsGrid');
+
+            const totalBooks = myBookList.length;
+            const finishedBooks = myBookList.filter(b => b.progress >= 100).length;
+            const readingBooks = myBookList.filter(b => b.progress > 0 && b.progress < 100).length;
+            const avgRating = myBookList.filter(b => b.rating > 0).length > 0
+                ? (myBookList.reduce((sum, b) => sum + b.rating, 0) / myBookList.filter(b => b.rating > 0).length).toFixed(1)
+                : 0;
+            const reviewedBooks = myBookList.filter(b => b.review && b.review.trim()).length;
+
+            // 按类别统计
+            const categoryStats = {};
+            myBookList.forEach(book => {
+                categoryStats[book.category] = (categoryStats[book.category] || 0) + 1;
+            });
+
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${totalBooks}</div>
+                    <div class="stat-label">我的书单总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${finishedBooks}</div>
+                    <div class="stat-label">已完成阅读</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${readingBooks}</div>
+                    <div class="stat-label">阅读中</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${avgRating || '未评'}</div>
+                    <div class="stat-label">平均评分</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${reviewedBooks}</div>
+                    <div class="stat-label">已写读后感</div>
+                </div>
+            `;
+
+            // 添加类别统计
+            if (Object.keys(categoryStats).length > 0) {
+                container.innerHTML += '<h3 style="grid-column: 1/-1; margin: 20px 0 0; color: #333;">阅读类别分布</h3>';
+                Object.entries(categoryStats).forEach(([category, count]) => {
+                    container.innerHTML += `
+                        <div class="stat-card">
+                            <div class="stat-value">${count}</div>
+                            <div class="stat-label">${category}</div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // 导出数据
+        function exportData() {
+            const data = {
+                exportDate: new Date().toLocaleDateString('zh-CN'),
+                myBookList: myBookList,
+                weeklyRecommendations: weeklyRecommendations
+            };
+
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `我的阅读数据_${new Date().toLocaleDateString('zh-CN')}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 切换标签页
+        function switchTab(tabName) {
+            // 更新标签按钮状态
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach((tab, index) => {
+                tab.classList.remove('active');
+                const tabNames = ['recommend', 'mylist', 'stats'];
+                if (tabNames[index] === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // 更新内容显示
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+
+            // 渲染对应内容
+            if (tabName === 'mylist') {
+                renderMyList();
+            } else if (tabName === 'stats') {
+                renderStats();
+            }
+        }
+
+        // 页面加载时初始化
+        window.onload = init;
+    </script>
+</body>
+</html>
